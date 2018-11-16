@@ -41,6 +41,8 @@ import org.pjsip.pjsua2.SipHeader;
 import org.pjsip.pjsua2.SipHeaderVector;
 import org.pjsip.pjsua2.SipTxOption;
 import org.pjsip.pjsua2.StringVector;
+import org.pjsip.pjsua2.ToneDesc;
+import org.pjsip.pjsua2.ToneDescVector;
 import org.pjsip.pjsua2.TransportConfig;
 import org.pjsip.pjsua2.CodecInfoVector;
 import org.pjsip.pjsua2.CodecInfo;
@@ -98,6 +100,12 @@ public class PjSipService extends Service {
     private PowerManager.WakeLock mIncallWakeLock;
 
     private TelephonyManager mTelephonyManager;
+
+    private ToneDesc toneDesc;
+
+    private org.pjsip.pjsua2.ToneGenerator toneGenerator;
+
+    private ToneDescVector toneDescVector;
 
     private WifiManager mWifiManager;
 
@@ -974,10 +982,20 @@ public class PjSipService extends Service {
 
     void emmitCallStateChanged(PjSipCall call, OnCallStateParam prm) {
         try {
-            if (call.getInfo().getState() == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+            final pjsip_inv_state callState = call.getInfo().getState();
+            final String lastReason = call.getInfo().getLastReason();
+
+            if (callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 emmitCallTerminated(call, prm);
             } else {
                 emmitCallChanged(call, prm);
+            }
+
+            Log.d(TAG, "State change" + lastReason );
+            if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY) {
+                startRingbackTone();
+            } else if (lastReason.equals("Ringing")) {
+                stopRingbackTone();
             }
         } catch (Exception e) {
             Log.w(TAG, "Failed to handle call state event", e);
@@ -1105,5 +1123,48 @@ public class PjSipService extends Service {
                 mGSMIdle = true;
             }
         }
+    }
+
+    private class TONE_USA_RINGBACK {
+        public final static int kSPRingbackFrequency1 = 440,
+            kSPRingbackFrequency2 = 480,
+            kSPRingbackOnDuration = 1000,
+            kSPRingbackOffDuration = 4000,
+            kSPRingbackCount = 1,
+            kSPRingbackInterval = 4000;
+    }
+
+    private void startRingbackTone() {
+
+        toneDesc = new ToneDesc();
+        toneGenerator = new org.pjsip.pjsua2.ToneGenerator();
+        toneDescVector = new ToneDescVector();
+
+        toneDesc.setFreq1((short) TONE_USA_RINGBACK.kSPRingbackFrequency1);
+        toneDesc.setFreq2((short) TONE_USA_RINGBACK.kSPRingbackFrequency2);
+        toneDesc.setOn_msec((short) TONE_USA_RINGBACK.kSPRingbackOnDuration);
+        toneDesc.setOff_msec((short) TONE_USA_RINGBACK.kSPRingbackOffDuration);
+
+        toneDescVector.add(toneDesc);
+
+        try {
+            toneGenerator.createToneGenerator();
+            toneGenerator.play(toneDescVector, true);
+            toneGenerator.startTransmit(getAudDevManager().getPlaybackDevMedia());
+        } catch (Exception ex) { 
+            Log.w(TAG, "Failed to stop ring back tone");
+        }
+    }
+
+    private void stopRingbackTone() {
+
+        try {
+            if (toneGenerator != null)
+                toneGenerator.stop();
+            toneGenerator = null;
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to stop ring back tone", e);
+        }
+
     }
 }
