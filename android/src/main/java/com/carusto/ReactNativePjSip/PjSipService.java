@@ -275,6 +275,8 @@ public class PjSipService extends Service {
             Log.w(TAG, "Failed to destroy PjSip library", e);
         }
 
+        unregisterReceiver(mPhoneStateChangedReceiver);
+
         super.onDestroy();
     }
 
