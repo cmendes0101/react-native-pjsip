@@ -944,7 +944,7 @@ public class PjSipService extends Service {
 
         
         // Automatically start application when incoming call received.
-        if (mAppHidden) {
+        // if (mAppHidden) {
             try {
                 String ns = getApplicationContext().getPackageName();
                 String cls = ns + ".MainActivity";
@@ -958,7 +958,7 @@ public class PjSipService extends Service {
             } catch (Exception e) {
                 Log.w(TAG, "Failed to open application on received call", e);
             }
-        }
+        // }
 
         job(new Runnable() {
             @Override
