@@ -932,7 +932,7 @@ public class PjSipService extends Service {
             return;
         }
 
-        /**
+        
         // Automatically start application when incoming call received.
         if (mAppHidden) {
             try {
@@ -965,7 +965,6 @@ public class PjSipService extends Service {
                 }
             }
         });
-        **/
 
         // -----
         mCalls.add(call);
