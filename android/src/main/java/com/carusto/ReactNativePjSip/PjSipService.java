@@ -1,6 +1,7 @@
 package com.carusto.ReactNativePjSip;
 
 import android.app.Service;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -932,23 +933,32 @@ public class PjSipService extends Service {
             return;
         }
 
-        /**
+        
         // Automatically start application when incoming call received.
-        if (mAppHidden) {
+        // if (mAppHidden) {
             try {
+                Log.w(TAG, "CAll is coming in.. open the app");
+
                 String ns = getApplicationContext().getPackageName();
                 String cls = ns + ".MainActivity";
 
-                Intent intent = new Intent(getApplicationContext(), Class.forName(cls));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.EXTRA_DOCK_STATE_CAR);
-                intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                intent.putExtra("foreground", true);
+                    Log.w(TAG, "PJSIP app is not running on foreground, open it up");
 
-                startActivity(intent);
+                    Intent intent = new Intent(getApplicationContext(), Class.forName(cls));
+                    // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.EXTRA_DOCK_STATE_CAR);
+                    // intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    // intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    intent.setAction(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_LAUNCHER);        
+                    intent.putExtra("incoming_call", true);
+
+                    startActivity(intent);
+
+                
             } catch (Exception e) {
                 Log.w(TAG, "Failed to open application on received call", e);
             }
-        }
+        // }
 
         job(new Runnable() {
             @Override
@@ -965,7 +975,7 @@ public class PjSipService extends Service {
                 }
             }
         });
-        **/
+
 
         // -----
         mCalls.add(call);

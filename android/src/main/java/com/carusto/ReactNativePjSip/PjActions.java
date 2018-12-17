@@ -63,6 +63,13 @@ public class PjActions {
         return intent;
     }
 
+    public static Intent createStopIntent(int callbackId, Context context) {
+        Intent intent = new Intent(context, PjSipService.class);
+        intent.putExtra("callback_id", callbackId);
+        
+        return intent;
+    }
+
     public static Intent createSetServiceConfigurationIntent(int callbackId, ReadableMap configuration, Context context) {
         Intent intent = new Intent(context, PjSipService.class);
         intent.setAction(PjActions.ACTION_SET_SERVICE_CONFIGURATION);
