@@ -969,7 +969,7 @@ public class PjSipService extends Service {
             } catch (Exception e) {
                 Log.w(TAG, "Failed to open application on received call", e);
             }
-        // }
+        }
 
         job(new Runnable() {
             @Override
@@ -987,7 +987,6 @@ public class PjSipService extends Service {
             }
         });
 
-        // -----
         mCalls.add(call);
         mEmitter.fireCallReceivedEvent(call);
     }
