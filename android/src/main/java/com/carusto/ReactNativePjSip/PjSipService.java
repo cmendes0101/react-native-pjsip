@@ -1,10 +1,12 @@
 package com.carusto.ReactNativePjSip;
 
 import android.app.Service;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -15,6 +17,7 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -944,17 +947,25 @@ public class PjSipService extends Service {
 
         
         // Automatically start application when incoming call received.
-        // if (mAppHidden) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Boolean isInForeground = preferences.getBoolean("app_foreground", false);
+
+        if (!isInForeground) {
             try {
+
                 String ns = getApplicationContext().getPackageName();
                 String cls = ns + ".MainActivity";
+                    Intent intent = new Intent(getApplicationContext(), Class.forName(cls));
+                    // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.EXTRA_DOCK_STATE_CAR);
+                    // intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    // intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    intent.setAction(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_LAUNCHER);        
+                    intent.putExtra("incoming_call", true);
 
-                Intent intent = new Intent(getApplicationContext(), Class.forName(cls));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.EXTRA_DOCK_STATE_CAR);
-                intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                intent.putExtra("foreground", true);
+                    startActivity(intent);
 
-                startActivity(intent);
+                
             } catch (Exception e) {
                 Log.w(TAG, "Failed to open application on received call", e);
             }
@@ -1102,7 +1113,7 @@ public class PjSipService extends Service {
             }
         }
     }
-
+      
     protected class PhoneStateChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
