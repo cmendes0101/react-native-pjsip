@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -937,15 +939,14 @@ public class PjSipService extends Service {
 
         
         // Automatically start application when incoming call received.
-        // if (mAppHidden) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Boolean isInForeground = preferences.getBoolean("app_foreground", false);
+
+        if (!isInForeground) {
             try {
-                Log.w(TAG, "CAll is coming in.. open the app");
 
                 String ns = getApplicationContext().getPackageName();
                 String cls = ns + ".MainActivity";
-
-                    Log.w(TAG, "PJSIP app is not running on foreground, open it up");
-
                     Intent intent = new Intent(getApplicationContext(), Class.forName(cls));
                     // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.EXTRA_DOCK_STATE_CAR);
                     // intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -960,7 +961,7 @@ public class PjSipService extends Service {
             } catch (Exception e) {
                 Log.w(TAG, "Failed to open application on received call", e);
             }
-        // }
+        }
 
         job(new Runnable() {
             @Override
