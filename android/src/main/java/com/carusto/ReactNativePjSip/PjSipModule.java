@@ -35,6 +35,14 @@ public class PjSipModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void stop(Callback callback) {
+        int id = receiver.register(callback);
+        Intent intent = PjActions.createStopIntent(id, getReactApplicationContext());
+
+        getReactApplicationContext().stopService(intent);
+    }
+
+    @ReactMethod
     public void changeServiceConfiguration(ReadableMap configuration, Callback callback) {
         int id = receiver.register(callback);
         Intent intent = PjActions.createSetServiceConfigurationIntent(id, configuration, getReactApplicationContext());

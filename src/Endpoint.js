@@ -106,6 +106,22 @@ export default class Endpoint extends EventEmitter {
         });
     }
 
+    stop() {
+        return new Promise(function(resolve, reject) {
+            NativeModules.PjSipModule.stop((successful, data) => {
+                resolve({
+                });
+
+                // if (successful) {
+                //     resolve({
+                //     });
+                // } else {
+                //     reject(data);
+                // }
+            });
+        });
+    }
+
     updateStunServers(accountId, stunServerList) {
         return new Promise(function(resolve, reject) {
             NativeModules.PjSipModule.updateStunServers(accountId, stunServerList, (successful, data) => {
