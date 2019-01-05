@@ -49,6 +49,13 @@
         cfg.cb.on_call_media_event = &onCallMediaEvent;
         
         cfg.cb.on_pager2 = &onMessageReceived;
+
+        cfg.stun_srv_cnt = 5;
+        cfg.stun_srv[0] = pj_str("stun1.l.google.com:19302");
+        cfg.stun_srv[1] = pj_str("stun2.l.google.com:19302");
+        cfg.stun_srv[2] = pj_str("stun3.l.google.com:19302");
+        cfg.stun_srv[3] = pj_str("stun4.l.google.com:19302");
+        cfg.stun_srv[4] = pj_str("stun.zoiper.com:3478");
         
         // on_call_video_state
         
